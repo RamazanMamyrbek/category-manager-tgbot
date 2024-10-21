@@ -7,11 +7,10 @@ spring:
     password: postgres
     driver-class-name: org.postgresql.Driver
   jpa:
-#    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
 
 bot:
-  name: ${TG_BOT_NAME}
-  token: ${TG_BOT_TOKEN}
+  name: ${TG_BOT_NAME:Pandev-telegram-bot-tree}
+  token: ${TG_BOT_TOKEN:7615638841:AAG4WWJ8Sx27z4d2uv0e1TzQvaMqesjsIMs}
