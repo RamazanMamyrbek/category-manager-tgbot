@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: category-manager-tgbot
+  datasource:
+    url: jdbc:postgresql://localhost:5432/Pandev-telegram-bot-tree
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+#    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+bot:
+  name: ${TG_BOT_NAME}
+  token: ${TG_BOT_TOKEN}
