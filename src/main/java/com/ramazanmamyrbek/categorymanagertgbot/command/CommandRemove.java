@@ -6,7 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public class CommandRemove implements Command{
     private final MessageSender messageSender;
     private static final String ADD_MESSAGE = """
-            Enter element ID(only number): 
+            Enter element name: 
             
             Exit executing command by /exit
             """;

@@ -2,6 +2,7 @@ package com.ramazanmamyrbek.categorymanagertgbot.services;
 
 import com.ramazanmamyrbek.categorymanagertgbot.controller.MessageSender;
 import com.ramazanmamyrbek.categorymanagertgbot.controller.UpdateController;
+import com.ramazanmamyrbek.categorymanagertgbot.exception.CategoryNameContainsWhiteSpaceException;
 import com.ramazanmamyrbek.categorymanagertgbot.exception.CategoryNotFoundException;
 import com.ramazanmamyrbek.categorymanagertgbot.models.Category;
 import com.ramazanmamyrbek.categorymanagertgbot.repositories.CategoryRepository;
@@ -35,7 +36,9 @@ public class CategoryService {
     }
 
     public Category getCategoryByName(String name) {
-        return categoryRepository.findByName(name).orElseThrow(() -> new RuntimeException("Not found"));
+        return categoryRepository.findByName(name).orElseThrow(() -> new CategoryNotFoundException("""
+                Category with name '%s' is not found.
+                """.formatted(name)));
     }
 
     @Transactional
@@ -92,6 +95,18 @@ public class CategoryService {
                     """.formatted(words[0]));
                 return;
             }
+            if(categoryRepository.findByName(words[1]).isPresent()) {
+                messageSender.sendMessage(update.getMessage().getChatId().toString(), """
+                        Element with name '%s' is already exists. Try another name.
+                        
+                        Add element using one of this templates: \n
+                        1. <parent-element> <child-element>
+                        2. <element>
+                                    
+                        Exit executing command by /exit
+                        """.formatted(words[1]));
+                return;
+            }
             List<Category> childCategories = categoryRepository.findAllByParentName(words[0]);
             List<String> childCategoriesNames = childCategories.stream().map(Category::getName).toList();
             if(childCategoriesNames.contains(words[1])) {
@@ -141,8 +156,11 @@ public class CategoryService {
     @Transactional
     public void removeCategory(String messageCame, Update update) {
         try {
-            Long id = Long.parseLong(messageCame);
-            removeCategoryById(id);
+            if(messageCame.contains(" ")) {
+                throw new CategoryNameContainsWhiteSpaceException("Enter only one word");
+            }
+            messageCame = messageCame.trim();
+            removeCategoryByName(messageCame);
             messageSender.sendMessage(update.getMessage().getChatId().toString(), """
                     Element has been successfully removed.
                     
@@ -151,17 +169,16 @@ public class CategoryService {
                     """);
             updateController.setRemoveStatus(false);
 
-        } catch (NumberFormatException e) {
-            messageSender.sendMessage(update.getMessage().getChatId().toString(), """
-                    Enter only single a number
-                    """);
+        } catch (CategoryNameContainsWhiteSpaceException e) {
+            messageSender.sendMessage(update.getMessage().getChatId().toString(), e.getMessage());
         } catch (CategoryNotFoundException e) {
             messageSender.sendMessage(update.getMessage().getChatId().toString(), e.getMessage());
         }
     }
 
-    public void removeCategoryById(Long id) {
-        categoryRepository.deleteById(id);
+    public void removeCategoryByName(String name) {
+        Category category = getCategoryByName(name);
+        categoryRepository.deleteByName(name);
     }
 
     private Category getCategoryById(Long id) {

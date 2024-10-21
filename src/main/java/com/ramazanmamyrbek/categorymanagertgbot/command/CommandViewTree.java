@@ -40,8 +40,6 @@ public class CommandViewTree implements Command{
                 .append("      ".repeat(level))
                 .append("—")
                 .append(category.getName())
-                .append(" - id: ")
-                .append(category.getId())
                 .append("\n");
         List<Category> children = category.getChildren();
         if (category.getChildren() != null) {
