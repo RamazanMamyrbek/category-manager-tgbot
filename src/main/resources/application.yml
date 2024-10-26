@@ -12,5 +12,5 @@ spring:
     show-sql: true
 
 bot:
-  name: ${TG_BOT_NAME:Pandev-telegram-bot-tree}
-  token: ${TG_BOT_TOKEN:7615638841:AAG4WWJ8Sx27z4d2uv0e1TzQvaMqesjsIMs}
+  name: ${TG_BOT_NAME:}
+  token: ${TG_BOT_TOKEN:}
